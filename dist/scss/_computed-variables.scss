@@ -1,15 +1,20 @@
+@use "sass:list";
+@use "variables";
+
 // the calculations below are all based on the values in variables.
 // They should not be modified.
 // -----------------------------------------------------------------------------
-$g-max-body-width: ($g-column-count * $g-max-column-width) + (($g-column-count - 1) * $g-max-gutter-width);
+@use "sass:math";
 
-$g-column-decimal: $g-max-column-width / $g-max-body-width;
-$g-gutter-decimal: $g-max-gutter-width / $g-max-body-width;
+$g-max-body-width: (variables.$g-column-count * variables.$g-max-column-width) + ((variables.$g-column-count - 1) * variables.$g-max-gutter-width);
+
+$g-column-decimal: math.div(variables.$g-max-column-width, $g-max-body-width);
+$g-gutter-decimal: math.div(variables.$g-max-gutter-width, $g-max-body-width);
 
 $g-column: $g-column-decimal * 100%;
 $g-gutter: $g-gutter-decimal * 100%;
 
-$g-column-template: repeat($g-column-count, 1fr);
+$g-column-template: repeat(variables.$g-column-count, 1fr);
 $g-column-gap: $g-gutter;
 
 // place the 'max-body' and 'base' breakpoints at the correct place inside our
@@ -22,24 +27,24 @@ $g-column-gap: $g-gutter;
   $calcSize: 0;
   $breakpoints: ();
 
-  @each $bp, $bp-width, $bp-inset in $g-user-breakpoints {
+  @each $bp, $bp-width, $bp-inset in variables.$g-user-breakpoints {
     // now find the correct place to insert the max body breakpoint
     @if $bp-inset != 'auto' {
       $calcSize: $g-max-body-width + ($bp-inset * 2);
 
       @if ($calcSize < $bp-width and $max-body-inserted == false) {
-        $breakpoints: append($breakpoints, 'max-body' $calcSize auto);
+        $breakpoints: list.append($breakpoints, 'max-body' $calcSize auto);
         $max-body-inserted: true;
       }
     } @else if $max-body-inserted == false {
       // if we didn't hit a match before we reached 'auto' inset values then use the
       // latest available values and insert the 'max-body' breakpoint
-      $breakpoints: append($breakpoints, 'max-body' $calcSize auto);
+      $breakpoints: list.append($breakpoints, 'max-body' $calcSize auto);
       $max-body-inserted: true;
     }
 
     // append the user breakpoint
-    $breakpoints: append($breakpoints, $bp $bp-width $bp-inset);
+    $breakpoints: list.append($breakpoints, $bp $bp-width $bp-inset);
   }
 
   @return $breakpoints;
